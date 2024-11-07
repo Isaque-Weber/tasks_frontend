@@ -1,0 +1,83 @@
+<header>
+    <h1><a routerLink="/tasks">Tarefas</a></h1>
+</header>
+
+<main>
+    <div class="tasks" #tasksTable>
+        <div class="actions">
+            <button class="btn-add" mat-fab extended (click)="addTask()">
+                <mat-icon>add</mat-icon>
+                Adicionar tarefa
+            </button>
+        </div>
+        <table>
+            <thead>
+            <th colspan="2">Nome</th>
+            <th>Custo</th>
+            <th>Data limite</th>
+            <th>Ações</th>
+            </thead>
+            <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+                @if (isCreatingTask) {
+                    <tr>
+                        <td colspan="2"><input type="text" #inputNameCreate></td>
+                        <td><input type="number" #inputCostCreate></td>
+                        <td><input type="date" #inputDateCreate></td>
+                        <td class="actions">
+                            <button class="btn-save" mat-mini-fab aria-label="salvar"
+                                    (click)="saveNewTask(inputNameCreate.value, inputCostCreate.value, inputDateCreate.value)">
+                                <mat-icon>save</mat-icon>
+                            </button>
+                            <button class="btn-delete" mat-mini-fab aria-label="cancelar"
+                                    (click)="cancelNewTask(inputNameCreate, inputCostCreate, inputDateCreate)">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                    </tr>
+                }
+                @for (task of tasks; track task.id) {
+                    <tr [ngClass]="{'stark': task.cost > 1000}" cdkDrag (cdkDragStarted)="startDragging($event, task.cost > 1000)" (cdkDragEnded)="endedDragging($event)">
+                        <td cdkDragHandle class="handle-drag"><mat-icon>drag_indicator</mat-icon></td>
+                        <td><input #inputName type="text" [value]="task.name" [readonly]="isEditingTask != task.id">
+                        </td>
+                        <td><input #inputCost type="number" [value]="task.cost" [readonly]="isEditingTask != task.id">
+                        </td>
+                        <td><input #inputDate [type]="'date'"
+                                   [value]="task.date" [readonly]="isEditingTask != task.id">
+                        </td>
+                        <td class="actions">
+                            @if (isEditingTask == task.id) {
+                                <button class="btn-save" mat-mini-fab aria-label="salvar"
+                                        (click)="updateTask(inputName.value, inputCost.value, inputDate.value, task.id)">
+                                    <mat-icon>save</mat-icon>
+                                </button>
+                                <button class="btn-delete" mat-mini-fab aria-label="cancelar"
+                                        (click)="cancelEditTask(inputName, inputCost, inputDate, task.id)">
+                                    <mat-icon>cancel</mat-icon>
+                                </button>
+                            } @else {
+                                <button class="btn-save" mat-mini-fab aria-label="editar"
+                                        (click)="enableEditTask(task.id)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                <button class="btn-delete" mat-mini-fab aria-label="excluir"
+                                        (click)="deleteDialog(task.id)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                } @empty {
+                    @if (!isCreatingTask) {
+                        <tr>
+                            <td colspan="4">Nenhuma tarefa cadastrada</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>
+    <p>© 2024 - Isaque Weber</p>
+</footer>
